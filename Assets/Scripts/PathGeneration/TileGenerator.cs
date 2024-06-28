@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace PathGeneration
@@ -14,23 +11,16 @@ namespace PathGeneration
         [SerializeField] private List<ITile> currentTiles = new();
         [SerializeField] private Transform tileSpawnPoint;
 
-        private IPathGenerationRule pathGenerationRule;
+        private readonly IPathGenerationRule pathGenerationRule = new PathGenerationRule();
 
         public List<ITile> CurrentTiles { get { return currentTiles; } }
-
-        void Awake()
-        {
-            pathGenerationRule = new PathGenerationRule();
-        }
 
         void Start()
         {
             for (int i = 0; i < maxTilesCount; i++)
             {
                 GenerateTile();
-            }
-            Debug.Log(tilePrefabs[2].transform.localEulerAngles.y);
-            Debug.Log(tilePrefabs[2].transform.localPosition.x);
+            }  
         }
 
         private void GenerateTile()
@@ -53,8 +43,6 @@ namespace PathGeneration
 
             currentTiles.Add(generatedTile);
         }
-
-        
 
         private void OnTriggerEnter(Collider other)
         {

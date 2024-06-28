@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace PathGeneration
@@ -13,6 +11,5 @@ namespace PathGeneration
         Vector3 RoadEndPosition { get; }
 
         void Move();
-        Vector3 GetNextGenerationPosition();
     }
 }

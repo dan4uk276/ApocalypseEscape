@@ -1,15 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PathGeneration
 {
     public enum TileType
     {
-        None = - 1,
-        RoadTile = 0,
-        RightRoadTurnTile = 1,
-        LeftRoadTurnTile = 2
+        StraightTile = 0,
+        RightTurnTile = 1,
+        LeftTurnTile = 2
     }
 
     public class Tile : MonoBehaviour, ITile
@@ -23,15 +20,8 @@ namespace PathGeneration
         public TileType TileType => tileType;
         public float TileLength => tileLength;
         public Transform Transform => transform;
-
         public Vector3 RoadStartPosition => roadStartPosition;
-
         public Vector3 RoadEndPosition => roadEndPosition;
-
-        void Start()
-        {
-            speed = 10f;
-        }
 
         void FixedUpdate()
         {
@@ -41,11 +31,6 @@ namespace PathGeneration
         public void Move()
         {
             transform.Translate(Vector3.back * speed * Time.fixedDeltaTime, Space.World);
-        }
-
-        public Vector3 GetNextGenerationPosition()
-        {
-            return Vector3.zero;
         }
     }
 }
