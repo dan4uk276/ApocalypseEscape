@@ -128,6 +128,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   tileLength: 10
+  tileType: 0
+  roadStartPosition: {x: -10, y: 0, z: 0}
+  roadEndPosition: {x: -10, y: 0, z: 10}
 --- !u!65 &3494972773045625924
 BoxCollider:
   m_ObjectHideFlags: 0
