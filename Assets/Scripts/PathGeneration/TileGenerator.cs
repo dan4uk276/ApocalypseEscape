@@ -9,7 +9,7 @@ namespace PathGeneration
         [SerializeField] private List<GameObject> tilePrefabs;
         [SerializeField] private int maxTilesCount;
         [SerializeField] private List<ITile> currentTiles = new();
-        [SerializeField] private Transform tileSpawnPoint;
+        [SerializeField] private Transform tilesSpawnPoint;
 
         private readonly IPathGenerationRule pathGenerationRule = new PathGenerationRule();
 
@@ -37,7 +37,7 @@ namespace PathGeneration
             GameObject generatedTileObject = Instantiate(pendingTileObject,
                                                          newTilePosition,
                                                          newTileRotation,
-                                                         tileSpawnPoint);
+                                                         tilesSpawnPoint);
 
             ITile generatedTile = generatedTileObject.GetComponent<ITile>();
 

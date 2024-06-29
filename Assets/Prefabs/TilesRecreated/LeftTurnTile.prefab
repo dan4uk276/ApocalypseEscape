@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5175b4870ada706488f04cbab400d327, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 5
   tileLength: 10
   tileType: 2
   roadStartPosition: {x: -10, y: 0, z: 0}

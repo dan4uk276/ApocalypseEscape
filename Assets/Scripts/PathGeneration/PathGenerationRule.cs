@@ -1,26 +1,49 @@
 using System.Collections.Generic;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace PathGeneration
 {
     public class PathGenerationRule : IPathGenerationRule
     {
+        private const int TilesCountBetweenTurns = 8;
+
+        private readonly PathGenerationRuleData ruleData;
+
+        private readonly Dictionary<TileType, Vector3> positionRuleForNextTileConnection;
+
+        private readonly Dictionary<TileType, Quaternion> rotationRuleForNextTileConnection;
+
+        public PathGenerationRule()
+        {
+            ruleData = new();
+
+            positionRuleForNextTileConnection = new()
+            {
+                {TileType.StraightTile,  new Vector3(0f, 0f, ruleData.TileLength)},
+                {TileType.RightTurnTile, new Vector3(ruleData.TileLength, 0f, ruleData.TileLength)},
+                {TileType.LeftTurnTile,  new Vector3(-ruleData.TileLength, 0f, ruleData.TileLength)}
+            };
+
+            rotationRuleForNextTileConnection = new()
+            {
+                {TileType.StraightTile,  Quaternion.Euler(Vector3.zero)},
+                {TileType.RightTurnTile, Quaternion.Euler(0f, ruleData.TileRotationAfterRightTurn, 0f)},
+                {TileType.LeftTurnTile,  Quaternion.Euler(0f, ruleData.TileRotationAfterLeftTurn, 0f)}
+            };
+        }
 
         public ITile DecideNextTile(List<GameObject> tilePrefabs, List<ITile> currentTiles)
         {
-            if (currentTiles.Count < 4)
+            if (AreLastTilesStraight(currentTiles, TilesCountBetweenTurns))
             {
-                return tilePrefabs[(int)TileType.StraightTile].GetComponent<ITile>();
-            }
-
-            if (AreLastTilesRoad(currentTiles, 4))
-            {
-                TileType tileType = (TileType)Random.Range((int)TileType.RightTurnTile,
-                                                           (int)TileType.LeftTurnTile + 1);
+                TileType tileType = (TileType) Random.Range((int)TileType.RightTurnTile,
+                                                            (int)TileType.LeftTurnTile + 1);
 
                 return tilePrefabs[(int)tileType].GetComponent<ITile>();
             }
-
+            
             ITile pendingTile = tilePrefabs[(int)TileType.StraightTile].GetComponent<ITile>();
 
             return pendingTile;
@@ -36,24 +59,11 @@ namespace PathGeneration
 
             Vector3 lastTilePosition = lastTileInList.Transform.position;
 
-            Vector3 nextTileLocalPosition = new(0f, 0f, lastTileInList.TileLength);
-
-            if (lastTileInList.TileType == TileType.RightTurnTile &&
-               pendingTile.TileType == TileType.StraightTile)
-            {
-                nextTileLocalPosition = new Vector3(10f, 0f, 10f);         
-            }
-            
-            if(lastTileInList.TileType == TileType.LeftTurnTile &&
-               pendingTile.TileType == TileType.StraightTile)
-            {
-                nextTileLocalPosition = new Vector3(-10f, 0f, 10f);  
-            }
-
+            Vector3 nextTileLocalPosition = positionRuleForNextTileConnection[lastTileInList.TileType];
+           
             nextTileLocalPosition = lastTileInList.Transform.TransformDirection(nextTileLocalPosition);
 
             return lastTilePosition + nextTileLocalPosition;
-
         }
 
         public Quaternion GetNextTileRotation(ITile lastTileInList, ITile pendingTile)
@@ -65,19 +75,11 @@ namespace PathGeneration
 
             Quaternion lastTileLocalRotation = lastTileInList.Transform.localRotation;
 
-            if (lastTileInList.TileType == TileType.RightTurnTile)
-            {
-                lastTileLocalRotation *= Quaternion.Euler(0f, 90f, 0f);
-            }
-
-            if (lastTileInList.TileType == TileType.LeftTurnTile)
-            {
-                lastTileLocalRotation *= Quaternion.Euler(0f, -90f, 0f);
-            }
+            lastTileLocalRotation *= rotationRuleForNextTileConnection[lastTileInList.TileType];
 
             return lastTileLocalRotation;
         }
-        private bool AreLastTilesRoad(List<ITile> currentTiles, int tilesCount)
+        private bool AreLastTilesStraight(List<ITile> currentTiles, int tilesCount)
         {
             if (currentTiles.Count < tilesCount)
             {
